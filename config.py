@@ -19,7 +19,7 @@ TG_REPORT_CHAT_ID = os.environ.get("TG_REPORT_CHAT_ID", "")
 
 # --- OpenRouter ---
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "meta-llama/llama-3.2-3b-instruct:free")
+OPENROUTER_MODEL = "google/gemini-2.0-flash-lite-preview-02-05:free"
 
 # --- Файлы ---
 CHANNELS_FILE = "channels.json"
