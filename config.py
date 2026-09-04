@@ -19,7 +19,7 @@ TG_REPORT_CHAT_ID = os.environ.get("TG_REPORT_CHAT_ID", "")
 
 # --- OpenRouter ---
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL = "openrouter/free"
+OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
 
 # --- Файлы ---
 CHANNELS_FILE = "channels.json"
