@@ -1,7 +1,60 @@
+#!/usr/bin/env python3
+import sys
+import os
+import asyncio  # ← ВАЖНО! Добавил
+
+# ПРИНУДИТЕЛЬНЫЙ ВЫВОД ДЛЯ ОТЛАДКИ
+print("[main.py] НАЧАЛО ЗАГРУЗКИ", flush=True)
+print(f"[main.py] PYTHONPATH: {sys.path}", flush=True)
+print(f"[main.py] Переменные окружения: TG_API_ID={os.environ.get('TG_API_ID')}, TG_API_HASH={os.environ.get('TG_API_HASH')}", flush=True)
+
+# --- ИМПОРТЫ ---
+from telethon import TelegramClient
+from telethon.sessions import StringSession
+import config
+import collector
+from analyzer import filter_important, summarize_only, verify_and_summarize
+from reporter import send_report
+
 print("[main.py] ВСЕ МОДУЛИ ЗАГРУЖЕНЫ", flush=True)
 
-# --- ТЕПЕРЬ ЛОГИРУЕМ КАЖДЫЙ ШАГ ---
-print("[main.py] ШАГ 1: Начинаю асинхронный main()", flush=True)
+# --- ФУНКЦИИ ---
+async def run_once(client: TelegramClient):
+    print(f"[main] 🚀 Начинаю проверку...", flush=True)
+    
+    messages = await collector.collect_new_messages(client)
+    if not messages:
+        print("[main] ❌ Новых сообщений нет.", flush=True)
+        return
+
+    sources = collector.load_sources()
+    report_items = []
+
+    for msg in messages:
+        try:
+            importance = filter_important(msg["text"])
+        except Exception as e:
+            print(f"[main] ❌ Ошибка фильтрации (@{msg['channel']}): {e}", flush=True)
+            continue
+
+        if not importance.get("important"):
+            continue
+
+        print(f"[main] ✅ Важная новость из @{msg['channel']}", flush=True)
+
+        try:
+            if msg.get("verify") and sources:
+                result = verify_and_summarize(msg["text"], msg["channel"], sources)
+            else:
+                result = summarize_only(msg["text"], msg["channel"])
+        except Exception as e:
+            print(f"[main] ❌ Ошибка обработки (@{msg['channel']}): {e}", flush=True)
+            continue
+
+        report_items.append(result)
+
+    await send_report(report_items)
+    print(f"[main] ✅ Цикл завершён", flush=True)
 
 async def main():
     print("[main] 🚀 Telegram News Agent запускается...", flush=True)
@@ -43,7 +96,7 @@ async def main():
             print("[main] ✅ Разовый запуск завершён", flush=True)
 
 if __name__ == "__main__":
-    print("[main.py] ШАГ 2: Запускаю asyncio.run(main())", flush=True)
+    print("[main.py] Шаг 2: Запускаю asyncio.run(main())", flush=True)
     try:
         asyncio.run(main())
     except Exception as e:
