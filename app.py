@@ -12,19 +12,23 @@ from flask import Flask
 app = Flask(__name__)
 
 def start_agent():
-    """Запускает основного агента в фоне"""
+    """Запускает основного агента в фоне с принудительным выводом логов"""
     print("[app] 🚀 Запускаю агента...")
-    time.sleep(5)
+    time.sleep(3)
+    
+    # Запускаем с unbuffered выводом (-u) и перенаправляем stdout/stderr
     process = subprocess.Popen(
-        [sys.executable, "main.py", "--loop"],
+        [sys.executable, "-u", "main.py", "--loop"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=True
+        text=True,
+        bufsize=1  # построчный буфер
     )
     
-    # Показываем логи в реальном времени
-    for line in process.stdout:
+    # Читаем и выводим логи в реальном времени
+    for line in iter(process.stdout.readline, ''):
         print(f"[agent] {line.rstrip()}")
+        sys.stdout.flush()  # принудительный сброс
     
     process.wait()
 
