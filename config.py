@@ -2,10 +2,6 @@
 Конфигурация для Render.com
 """
 import os
-import logging
-
-# --- Настройка логирования ---
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
 # --- Telegram User API ---
 TG_API_ID = int(os.environ.get("TG_API_ID", "0"))
@@ -17,9 +13,9 @@ TG_SESSION_STRING = os.environ.get("TG_SESSION_STRING", "")
 TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
 TG_REPORT_CHAT_ID = os.environ.get("TG_REPORT_CHAT_ID", "")
 
-# --- OpenRouter ---
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+# --- FreeLLM (не нужны ключи!) ---
+# Модель выбирается автоматически из доступных
+FREELLM_MODEL = "mistral"  # или llama3, gemini, gpt-4o-mini, claude-3-haiku
 
 # --- Файлы ---
 CHANNELS_FILE = "channels.json"
@@ -28,5 +24,4 @@ SOURCES_FILE = "sources.json"
 
 # --- Параметры ---
 POLL_LIMIT_PER_CHANNEL = 30
-REPORT_INTERVAL_MINUTES = 2
-
+REPORT_INTERVAL_MINUTES = 30  # раз в 30 минут (не перегружаем)
