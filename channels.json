@@ -1,0 +1,14 @@
+[
+  {
+    "username": "biznes",
+    "verify": true
+  },
+  {
+    "username": "why4ch",
+    "verify": false
+  },
+  {
+    "username": "campcode",
+    "verify": false
+  }
+]

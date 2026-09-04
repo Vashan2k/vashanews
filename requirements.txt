@@ -1,0 +1,5 @@
+telethon>=1.36
+python-telegram-bot>=21.0
+requests>=2.31
+ddgs>=9.0.0
+flask>=3.0
