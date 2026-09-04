@@ -1,7 +1,3 @@
-"""
-app.py — запуск для Render.com
-Запускает health-сервер и агента в фоновом режиме
-"""
 import os
 import subprocess
 import sys
@@ -12,25 +8,30 @@ from flask import Flask
 app = Flask(__name__)
 
 def start_agent():
-    """Запускает основного агента в фоне с принудительным выводом логов"""
+    """Запускает агента и показывает ВСЕ ошибки в логах"""
     print("[app] 🚀 Запускаю агента...")
     time.sleep(3)
     
-    # Запускаем с unbuffered выводом (-u) и перенаправляем stdout/stderr
+    # Запускаем агента с принудительным выводом ВСЕГО
     process = subprocess.Popen(
         [sys.executable, "-u", "main.py", "--loop"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
-        bufsize=1  # построчный буфер
+        bufsize=1
     )
     
-    # Читаем и выводим логи в реальном времени
+    print("[app] ✅ Агент запущен, читаю логи...")
+    
+    # ВЫВОДИМ ВСЁ, ЧТО ПРИХОДИТ (включая ошибки)
     for line in iter(process.stdout.readline, ''):
         print(f"[agent] {line.rstrip()}")
-        sys.stdout.flush()  # принудительный сброс
+        sys.stdout.flush()
     
-    process.wait()
+    # Если процесс упал — покажем это
+    return_code = process.wait()
+    if return_code != 0:
+        print(f"[app] ❌ Агент завершился с ошибкой (код {return_code})")
 
 @app.route("/")
 @app.route("/health")
@@ -43,6 +44,7 @@ if __name__ == "__main__":
     # Запускаем агента в фоновом потоке
     thread = threading.Thread(target=start_agent, daemon=True)
     thread.start()
+    time.sleep(1)
     print("[app] ✅ Агент запущен в фоне")
     
     port = int(os.environ.get("PORT", 10000))
