@@ -1,36 +1,53 @@
 """
-Клиент для OpenRouter API — бесплатные LLM
-Регистрация: https://openrouter.ai
+Клиент для FreeLLM — бесплатный агрегатор LLM
+Не требует API-ключей и работает с 15+ провайдерами
 """
 import json
-import os
 import requests
 
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "meta-llama/llama-3.2-3b-instruct:free")
+FREELLM_URL = "https://api.freellm.xyz/v1"  # публичный эндпоинт
+
+# Бесплатные модели, доступные через FreeLLM
+AVAILABLE_MODELS = [
+    "mistral",
+    "llama3",
+    "gemini",
+    "gpt-4o-mini",
+    "claude-3-haiku"
+]
+
+DEFAULT_MODEL = "mistral"
+
 
 def generate(prompt: str, timeout: int = 120) -> str:
-    if not OPENROUTER_API_KEY:
-        raise ValueError("OPENROUTER_API_KEY не задан!")
+    """Отправляет промпт в FreeLLM и возвращает ответ"""
+    try:
+        resp = requests.post(
+            f"{FREELLM_URL}/chat/completions",
+            json={
+                "model": DEFAULT_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.7
+            },
+            timeout=timeout,
+            headers={"Content-Type": "application/json"}
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["choices"][0]["message"]["content"].strip()
+    except requests.exceptions.ConnectionError:
+        print("[llm_client] ❌ Не удалось подключиться к FreeLLM. Проверь интернет.")
+        raise
+    except requests.exceptions.Timeout:
+        print("[llm_client] ⏰ Таймаут запроса к FreeLLM")
+        raise
+    except Exception as e:
+        print(f"[llm_client] ❌ Ошибка: {e}")
+        raise
 
-    resp = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "model": OPENROUTER_MODEL,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.7,
-        },
-        timeout=timeout
-    )
-    resp.raise_for_status()
-    data = resp.json()
-    return data["choices"][0]["message"]["content"].strip()
 
 def generate_json(prompt: str, timeout: int = 120) -> dict:
+    """Просит модель вернуть JSON и парсит его"""
     raw = generate(prompt, timeout=timeout)
     raw = raw.replace("```json", "").replace("```", "").strip()
 
@@ -42,4 +59,5 @@ def generate_json(prompt: str, timeout: int = 120) -> dict:
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
+        print(f"[llm_client] ⚠️ Не удалось распарсить JSON: {raw[:200]}...")
         return {}
