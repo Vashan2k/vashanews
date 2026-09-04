@@ -1,14 +1,22 @@
-# В начале main() после импортов:
+#!/usr/bin/env python3
+import sys
+import os
 
-async def main():
-    print("[main] 🚀 Telegram News Agent запускается...")
-    
-    # Проверяем FreeLLM
-    try:
-        test = llm_client.generate("Say hello")
-        print("[main] ✅ FreeLLM работает!")
-    except Exception as e:
-        print(f"[main] ❌ FreeLLM не отвечает: {e}")
-        print("[main] ⚠️ Проверь интернет или попробуй другую модель")
-    
-    # ... остальной код
+# ПРИНУДИТЕЛЬНЫЙ ВЫВОД ДЛЯ ОТЛАДКИ
+print("[main.py] НАЧАЛО ЗАГРУЗКИ", flush=True)
+print(f"[main.py] PYTHONPATH: {sys.path}", flush=True)
+print(f"[main.py] Переменные окружения: TG_API_ID={os.environ.get('TG_API_ID')}, TG_API_HASH={os.environ.get('TG_API_HASH')}", flush=True)
+
+# --- ОСТАЛЬНОЙ КОД НИЖЕ ---
+import asyncio
+import sys
+from telethon import TelegramClient
+from telethon.sessions import StringSession
+import config
+import collector
+from analyzer import filter_important, summarize_only, verify_and_summarize
+from reporter import send_report
+
+print("[main.py] ВСЕ МОДУЛИ ЗАГРУЖЕНЫ", flush=True)
+
+# ... (весь остальной код main.py, который у тебя уже есть)
