@@ -24,4 +24,4 @@ SOURCES_FILE = "sources.json"
 
 # --- Параметры ---
 POLL_LIMIT_PER_CHANNEL = 30
-REPORT_INTERVAL_MINUTES = 30  # раз в 30 минут (не перегружаем)
+REPORT_INTERVAL_MINUTES = 0.1# раз в 30 минут (не перегружаем)
