@@ -10,7 +10,7 @@ app = Flask(__name__)
 def start_agent():
     """Запускает агента и показывает ВСЕ ошибки в логах"""
     print("[app] 🚀 Запускаю агента...")
-    time.sleep(3)
+    time.sleep(10)
     
     # Запускаем агента с принудительным выводом ВСЕГО
     process = subprocess.Popen(
