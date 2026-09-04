@@ -4,20 +4,14 @@
 """
 import json
 import requests
+import ssl
 
-FREELLM_URL = "https://api.freellm.xyz/v1"  # публичный эндпоинт
+# Отключаем предупреждения SSL
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Бесплатные модели, доступные через FreeLLM
-AVAILABLE_MODELS = [
-    "mistral",
-    "llama3",
-    "gemini",
-    "gpt-4o-mini",
-    "claude-3-haiku"
-]
-
+FREELLM_URL = "https://api.freellm.xyz/v1"
 DEFAULT_MODEL = "mistral"
-
 
 def generate(prompt: str, timeout: int = 120) -> str:
     """Отправляет промпт в FreeLLM и возвращает ответ"""
@@ -30,7 +24,8 @@ def generate(prompt: str, timeout: int = 120) -> str:
                 "temperature": 0.7
             },
             timeout=timeout,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
+            verify=False  # ← ОТКЛЮЧАЕМ ПРОВЕРКУ SSL
         )
         resp.raise_for_status()
         data = resp.json()
@@ -44,7 +39,6 @@ def generate(prompt: str, timeout: int = 120) -> str:
     except Exception as e:
         print(f"[llm_client] ❌ Ошибка: {e}")
         raise
-
 
 def generate_json(prompt: str, timeout: int = 120) -> dict:
     """Просит модель вернуть JSON и парсит его"""
