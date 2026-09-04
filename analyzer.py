@@ -1,4 +1,4 @@
-import llm_client
+import llm_client  # ← этот файл мы обновили
 import verifier
 
 def filter_important(message_text: str) -> dict:
