@@ -8,7 +8,7 @@ from openai import OpenAI
 
 # Конфигурация
 LLM7_BASE_URL = "https://api.llm7.io/v1"
-LLM7_API_KEY = "unused"  # реально работает, просто слово "unused"
+LLM7_API_KEY = os.environ.get("LLM7_API_KEY", "Lp4t2brwExYaz7ubDN/Xmj7HvOTMB8cJ8rwEGJX2DBcWTY1oKw/qwUxHiObIW+rkjumbDBTXfCjfgjtWDq1rd4awm7xPtyD9eeGF0tt2O1RUOwCoRvkmWbIiR/OcBCTbUtTUhiefvk/oqrwmrQ==") # реально работает, просто слово "unused"
 LLM7_MODEL = "default"   # или "fast", "deepseek-r1", "qwen2.5" [citation:11][citation:12]
 
 # Инициализируем клиент
